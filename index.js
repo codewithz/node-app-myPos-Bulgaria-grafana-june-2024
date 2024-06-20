@@ -3,6 +3,18 @@ const responseTime=require("response-time")
 const client=require("prom-client"); //Metric Collection
 const {doSomeHeavyTask} =require("./util")
 
+const { createLogger, transports, log } = require("winston");
+const LokiTransport = require("winston-loki");
+const options = {
+  transports: [
+    new LokiTransport({
+      host: "http://192.168.29.43:3100"
+    })
+  ]
+ 
+};
+const logger = createLogger(options);
+
 
 const app=express()
 const PORT=process.env.PORT || 8080;
@@ -33,11 +45,14 @@ app.use(responseTime((req,res,time)=>{
 
 
 app.get("/",(req,res)=>{
+    logger.info("Request came for / route")
     return res.json({message:'Hello from Express Server'})
 })
 
 app.get("/slow",async (req,res)=>{
+    
     try{
+        logger.info("Request came for /slow route")
         const timeTaken=await doSomeHeavyTask();
         return res.json({
             status:"Success",
@@ -45,6 +60,7 @@ app.get("/slow",async (req,res)=>{
         })
     }
     catch(error){
+        logger.error(error.message)
         return res
                 .status(500)
                 .json({status:'Error',error:'Internal Server Error'})
