@@ -1,12 +1,18 @@
 const express=require("express")
+const client=require("prom-client"); //Metric Collection
 const {doSomeHeavyTask} =require("./util")
 
 
 const app=express()
 const PORT=process.env.PORT || 8080;
 
+const collectDefaultMetrics=client.collectDefaultMetrics;
+
+collectDefaultMetrics({register:client.register})
+
+
 app.get("/",(req,res)=>{
-    return response.json({message:'Hello from Express Server'})
+    return res.json({message:'Hello from Express Server'})
 })
 
 app.get("/slow",async (req,res)=>{
