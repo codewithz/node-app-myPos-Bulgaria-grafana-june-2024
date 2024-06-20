@@ -7,7 +7,6 @@ const app=express()
 const PORT=process.env.PORT || 8080;
 
 const collectDefaultMetrics=client.collectDefaultMetrics;
-
 collectDefaultMetrics({register:client.register})
 
 
@@ -28,6 +27,12 @@ app.get("/slow",async (req,res)=>{
                 .status(500)
                 .json({status:'Error',error:'Internal Server Error'})
     }
+})
+
+app.get("/metrics",async(req,res)=>{
+    res.setHeader("Content-Type",client.register.contentType);
+    const metrics=await client.register.metrics();
+    res.send(metrics)
 })
 
 
