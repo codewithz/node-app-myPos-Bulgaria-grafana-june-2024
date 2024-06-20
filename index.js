@@ -17,7 +17,13 @@ const reqResTime=new client.Histogram({
     buckets: [1,50,100,200,400,500,800,1000,2000]
 });
 
+const totalRequestCounter=new client.Counter({
+    name:'total_request',
+    help:'This parameter tells the total requests received'
+})
+
 app.use(responseTime((req,res,time)=>{
+    totalRequestCounter.inc()
     reqResTime.labels({
         method:req.method,
         route:req.url,
